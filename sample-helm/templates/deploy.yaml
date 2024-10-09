@@ -1,0 +1,80 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: {{ .Values.project }}
+  name: {{ .Values.project }}-{{ .Values.APP_NAME }}
+  labels:
+    app: {{ .Values.project }}-{{ .Values.APP_NAME }}
+spec:
+  progressDeadlineSeconds: 600
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Values.project }}-{{ .Values.APP_NAME }}
+  strategy:
+    {{- toYaml .Values.strategy | nindent 3 }}
+  template:
+    metadata:
+    {{- if .Values.prometheus.enable }}
+      annotations:
+        prometheus.io/path: "{{ .Values.prometheus.path }}"
+        prometheus.io/port: "{{ .Values.prometheus.port }}"
+        prometheus.io/scrape: "true"
+    {{- end}}
+      labels:
+        app: {{ .Values.project }}-{{ .Values.APP_NAME }}
+    spec:
+      imagePullSecrets:
+      - name: {{ .Values.project }}-{{ .Values.APP_NAME }}-dockerlogin
+
+    {{- with .Values.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+{{- with .Values.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+{{- end }}
+{{- with .Values.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+{{- end }}    
+{{- if (.Values.serviceAccount) }}
+      automountServiceAccountToken: true
+      serviceAccount: {{ .Values.serviceAccount }}
+{{- end }}
+
+      containers:
+      - env:
+
+        - name: ENVIRONMENT
+          value: {{.Values.ENVIRONMENT | quote }}
+
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        name: {{ .Values.project }}-{{ .Values.APP_NAME }}
+        lifecycle:
+          preStop:
+            exec:
+              command:
+              - /bin/sleep
+              - "20"
+        ports:
+        - containerPort: {{ .Values.service.port }}
+          protocol: TCP
+        
+        resources:
+          {{- toYaml .Values.resources | nindent 12 }}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        securityContext:
+          runAsUser: 1000
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 45
+      dnsConfig:
+        options:
+        - name: ndots
+          value: "1"

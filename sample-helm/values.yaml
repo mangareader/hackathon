@@ -1,0 +1,44 @@
+project: hackathon
+ENVIRONMENT: staging # staging|production
+APP_NAME: web
+CI_JOB_ID: 1
+replicaCount: 1
+
+image:
+  repository: hieunt87/hackathon
+  tag: staging
+  pullPolicy: IfNotPresent
+
+
+service:
+  type: ClusterIP
+  port: 3000
+
+
+ingress:
+  host: test.hackthon.com
+  path: /
+
+
+strategy:
+  rollingUpdate:
+   maxSurge: 1
+   maxUnavailable: 0
+  type: RollingUpdate
+
+resources:
+  limits:
+   cpu: 500m
+   memory: 1024Mi
+  requests:
+   cpu: 50m
+   memory: 100Mi
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+prometheus:
+  enable: false

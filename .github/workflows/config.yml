@@ -1,0 +1,71 @@
+name: Build and Deploy to GKE
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag to deploy'
+        required: false
+        default: 'v0.0.1'
+
+
+env:
+  PROJECT_ID: ${{ secrets.GKE_PROJECT }}
+  GKE_CLUSTER: hackathon    # cluster name
+  GKE_ZONE: asia-southeast1-b   # cluster zone
+  IMAGE: web # image name
+
+jobs:
+  setup-build-publish-deploy:
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.tag != ''
+    name: Setup, Build, Publish, and Deploy
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+      if: ${{ github.event.inputs.tag != '' }}
+      with:
+        ref: ${{ github.event.inputs.tag }}
+    # Setup gcloud CLI
+    - id: 'auth'
+      uses: 'google-github-actions/auth@v0'
+      with:
+        credentials_json: '${{ secrets.GKE_SA_KEY }}'
+
+    - name: docker login
+      env:
+        DOCKER_USER: ${{secrets.DOCKER_USER}}
+        DOCKER_PASSWORD: ${{secrets.DOCKER_PASSWORD}}
+      run: |
+        docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
+
+    # Get the GKE credentials so we can deploy to the cluster
+    - name: Set up GKE credentials
+      uses: google-github-actions/get-gke-credentials@v0
+      with:
+        cluster_name: ${{ env.GKE_CLUSTER }}
+        location: ${{ env.GKE_ZONE }}
+
+    # Build the Docker image
+    - name: Build
+      run: |-
+        cd ./sample-app
+        docker build \
+          --tag "hieunt87/hackathon:$IMAGE_TAG" \
+          --build-arg GITHUB_SHA="$GITHUB_SHA" \
+          --build-arg GITHUB_REF="$GITHUB_REF" \
+          .
+    # Push the Docker image to Google Container Registry
+    - name: Publish
+      run: |-
+        docker push "hieunt87/hackathon:$IMAGE_TAG"
+
+    # Deploy the Docker image to the GKE cluster
+    - name: Deploy
+      run: |-
+        curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+        helm template --set tag=${{ github.event.inputs.tag }} ./sample-helm/ > kubernetes.yml
+        kubectl apply -f deploy.yml
+        kubectl get pods
