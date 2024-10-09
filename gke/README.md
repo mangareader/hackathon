@@ -29,11 +29,11 @@ helm install --values values_promtail.yaml promtail grafana/promtail
 
 Install prometheus for monitoring:
 
-    ```bash
-    helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
-    helm repo update
-    helm install --values values_prometheus.yaml prometheus prometheus-community/prometheus
-    ```
+```bash
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm repo update
+helm install --values values_prometheus.yaml prometheus prometheus-community/prometheus
+```
 Install grafana:
 
 ```bash
