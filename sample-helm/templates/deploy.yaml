@@ -49,7 +49,10 @@ spec:
 
         - name: ENVIRONMENT
           value: {{.Values.ENVIRONMENT | quote }}
-
+      {{- range $key, $value := .Values.server.env }} 
+        - name: "{{ $key }}" 
+          value: "{{ $value }}" 
+      {{- end }} 
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         name: {{ .Values.project }}-{{ .Values.APP_NAME }}

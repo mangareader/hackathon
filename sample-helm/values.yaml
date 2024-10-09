@@ -42,3 +42,6 @@ affinity: {}
 
 prometheus:
   enable: false
+server:
+  env: 
+    MONGOURI: "mongodb+srv://user:passs@mongodb.default.svc.cluster.local/"
