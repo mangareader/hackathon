@@ -19,19 +19,23 @@ Install nginx:
     ```
 
 Install promtail for logging:
+
     ```bash
     helm repo add grafana https://grafana.github.io/helm-charts
     helm repo update
     helm install --values values_loki.yaml loki grafana/loki
     helm install --values values_promtail.yaml promtail grafana/promtail
     ```
+
 Install prometheus for monitoring:
+
     ```bash
     helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
     helm repo update
     helm install --values values_prometheus.yaml prometheus prometheus-community/prometheus
     ```
 Install grafana:
+
     ```bash
     helm repo add grafana https://grafana.github.io/helm-charts
     helm repo update
