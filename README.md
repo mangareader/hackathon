@@ -13,6 +13,7 @@
 ## TODO
 - Change public gke cluster to private gke cluster
 - Use Dataplane-V2 increases security and performance for containers (eBPF - Cilium)
+- Application, Web Server, Monitoring tools should use separate node pool to isolate workloads 
 - database should use outside k8s and setup replicaset for HA
 - Setup KEDA autoscaler
 - Setup Harbor as container registry service
