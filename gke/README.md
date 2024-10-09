@@ -41,3 +41,11 @@ Install grafana:
     helm repo update
     helm install grafana grafana/grafana
     ```
+
+Install mongodb:
+
+    ```bash
+    helm repo add bitnami https://charts.bitnami.com/bitnami
+    helm repo update
+    helm install --values values_mongodb.yaml mongodb bitnami/mongodb 
+    ```

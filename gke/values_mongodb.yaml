@@ -1,0 +1,7 @@
+architecture: standalone
+
+persistence:
+  enabled: true
+  size: 10Gi
+auth:
+  rootPassword: yPJz5Mmzjk5q7O
