@@ -1,0 +1,6 @@
+gke/terraform/.terraform/*
+gke/terraform/terraform.tfstate
+.gitignore
+gke/terraform/.terraform.lock.hcl
+.gitignore
+gke/terraform/terraform.tfstate.backup
