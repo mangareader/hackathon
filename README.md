@@ -19,3 +19,4 @@
 - Setup Harbor as container registry service
 - Implement canary deployment strategy
 - Build helm repository
+- Implement hashicorp vault to store and inject secrets for applications
